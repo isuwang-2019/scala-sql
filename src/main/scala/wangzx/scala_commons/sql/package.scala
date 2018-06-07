@@ -2,12 +2,14 @@ package wangzx.scala_commons
 
 import javax.sql.DataSource
 import java.sql.{Blob, Clob, Connection, PreparedStatement, ResultSet, Timestamp}
+import java.time.{Instant, LocalDateTime, ZoneId}
 import java.util.Date
 
 import scala.language.implicitConversions
 import scala.language.experimental.macros
 
 package sql {
+
 
   /**
     * wrap a sql"select * from table where id = $id" object
@@ -230,6 +232,19 @@ package object sql {
 
   implicit object ResultSetMapper_Timestamp extends ResultSetMapper[Timestamp] {
     override def from(rs: ResultSet): Timestamp = rs.getTimestamp(1)
+  }
+
+
+  implicit object JdbcValueAccessor_LocalDateTime extends JdbcValueAccessor[LocalDateTime] {
+    override def passIn(stmt: PreparedStatement, index: Int, value: LocalDateTime): Unit = stmt.setTimestamp(index, new Timestamp(LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant.toEpochMilli))
+
+    override def passOut(rs: ResultSet, index: Int): LocalDateTime = LocalDateTime.ofInstant(Instant.ofEpochMilli( rs.getTimestamp(index).getTime),ZoneId.systemDefault())
+
+    override def passOut(rs: ResultSet, name: String): LocalDateTime =  LocalDateTime.ofInstant(Instant.ofEpochMilli( rs.getTimestamp(name).getTime),ZoneId.systemDefault())
+  }
+
+  implicit object ResultSetMapper_LocalDateTime extends ResultSetMapper[LocalDateTime] {
+    override def from(rs: ResultSet): LocalDateTime =  LocalDateTime.ofInstant(Instant.ofEpochMilli( rs.getTimestamp(1).getTime),ZoneId.systemDefault())
   }
 
   // extensions

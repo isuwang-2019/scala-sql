@@ -1,10 +1,10 @@
 organization := "com.github.wangzaixiang"
 
-name := "scala-sql"
+name := "scala-sql-isuwang"
 
-version := "2.0.6"
+version := "2.1.6"
 
-scalaVersion := "2.12.4"
+scalaVersion := "2.11.11"
 
 crossScalaVersions := Seq("2.11.11", "2.12.4")
 
@@ -19,31 +19,18 @@ libraryDependencies ++= Seq(
 )
 publishMavenStyle := true
 
-publishTo := {
-  val nexus = "https://oss.sonatype.org/"
-  if (version.value.endsWith("SNAPSHOT"))
-    Some("snapshots" at nexus + "content/repositories/snapshots")
-  else
-    Some("releases"  at nexus + "service/local/staging/deploy/maven2")
-}
+
+resolvers ++= List("isuwang nexus" at "http://nexus.oa.isuwang.com/repository/maven-public",
+  "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots",
+  "Objectify Play Repository" at "http://schaloner.github.io/releases/",
+  "Objectify Play Snapshot Repository" at "http://schaloner.github.io/snapshots/"
+)
+
+publishTo := Some("nexus-releases" at "http://nexus.oa.isuwang.com/repository/maven-releases/")
+
+credentials += Credentials("Sonatype Nexus Repository Manager", "nexus.oa.isuwang.com", "admin", "6d17f21ed")
+
 
 publishArtifact in Test := false
 
 pomIncludeRepository := { _ => false }
-
-pomExtra := (
-  <url>http://github.com/wangzaixiang/scala-sql</url>
-    <licenses>
-      <license>
-        <name>BSD-style</name>
-        <url>http://www.opensource.org/licenses/bsd-license.php</url>
-        <distribution>repo</distribution>
-      </license>
-    </licenses>
-    <developers>
-      <developer>
-        <id>wangzaixiang</id>
-        <name>wangzaixiang</name>
-        <url>http://wangzaixiang.github.io</url>
-      </developer>
-    </developers>)
