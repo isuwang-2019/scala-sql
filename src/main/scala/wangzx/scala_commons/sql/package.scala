@@ -236,7 +236,7 @@ package object sql {
 
 
   implicit object JdbcValueAccessor_LocalDateTime extends JdbcValueAccessor[LocalDateTime] {
-    override def passIn(stmt: PreparedStatement, index: Int, value: LocalDateTime): Unit = stmt.setTimestamp(index, new Timestamp(LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant.toEpochMilli))
+    override def passIn(stmt: PreparedStatement, index: Int, value: LocalDateTime): Unit = stmt.setTimestamp(index, new Timestamp(value.atZone(ZoneId.systemDefault()).toInstant.toEpochMilli))
 
     override def passOut(rs: ResultSet, index: Int): LocalDateTime = LocalDateTime.ofInstant(Instant.ofEpochMilli( rs.getTimestamp(index).getTime),ZoneId.systemDefault())
 
