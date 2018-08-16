@@ -11,7 +11,6 @@ crossScalaVersions := Seq("2.11.11", "2.12.4")
 libraryDependencies ++= Seq(
   "org.slf4j" % "slf4j-api" % "1.7.9",
   "org.scala-lang" % "scala-reflect" % scalaVersion.value,
-
   "com.h2database" % "h2" % "1.4.184" % "test",
   "junit" % "junit" % "4.12" % "test",
   "ch.qos.logback" % "logback-classic" % "1.1.3" % "test",
@@ -30,7 +29,7 @@ publishTo := Some("nexus-releases" at "http://nexus.oa.isuwang.com/repository/ma
 
 credentials += Credentials("Sonatype Nexus Repository Manager", "nexus.oa.isuwang.com", "admin", "6d17f21ed")
 
-
 publishArtifact in Test := false
 
 pomIncludeRepository := { _ => false }
+
