@@ -1,4 +1,4 @@
-package wangzx.scala_commons.sql
+package com.isuwang.scala_commons.sql
 
 import java.io.FileInputStream
 import java.sql.{Connection, Driver, ResultSet}
@@ -61,7 +61,7 @@ object Macros {
 
     val tree =
       q"""
-         import wangzx.scala_commons.sql._
+         import com.isuwang.scala_commons.sql._
          import java.sql.ResultSet
 
          new CaseClassResultSetMapper[$t] {
@@ -130,7 +130,7 @@ object Macros {
       }
     }
 
-    q"""wangzx.scala_commons.sql.SQLWithArgs($stmt, Seq(..$args))"""
+    q"""com.isuwang.scala_commons.sql.SQLWithArgs($stmt, Seq(..$args))"""
   }
 
   object SqlChecker {

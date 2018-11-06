@@ -1,9 +1,9 @@
-package wangzx.scala_commons.sql_test
+package com.isuwang.scala_commons.sql_test
 
 import java.sql.DriverManager
 
-import wangzx.scala_commons.sql.mysql.MySqlBitSet
-import wangzx.scala_commons.sql._
+import com.isuwang.scala_commons.sql.mysql.MySqlBitSet
+import com.isuwang.scala_commons.sql._
 
 object TestBitSet {
 

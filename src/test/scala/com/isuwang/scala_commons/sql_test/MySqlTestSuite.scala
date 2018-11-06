@@ -1,9 +1,9 @@
-package wangzx.scala_commons.sql_test
+package com.isuwang.scala_commons.sql_test
 
 import com.mysql.jdbc.jdbc2.optional.MysqlDataSource
 import org.junit.{Assert, Test}
 
-import wangzx.scala_commons.sql._
+import com.isuwang.scala_commons.sql._
 /**
   * Created by wangzx on 15/12/18.
   */

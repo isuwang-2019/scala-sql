@@ -1,6 +1,6 @@
-package wangzx.scala_commons.sql_test
+package com.isuwang.scala_commons.sql_test
 
-import wangzx.scala_commons.sql.{BeanBuilder, ResultSetMapper}
+import com.isuwang.scala_commons.sql.{BeanBuilder, ResultSetMapper}
 
 import scala.language.implicitConversions
 
@@ -25,7 +25,7 @@ object BuilderTest {
     id: String,
     name: String,
     opId: List[String],
-    address: PersonAddress,
+    address: PersonAddress
     //dady: Person
   )
   case class PersonAddress

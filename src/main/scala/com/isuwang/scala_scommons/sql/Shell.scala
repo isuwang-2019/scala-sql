@@ -1,4 +1,4 @@
-package wangzx.scala_commons.sql
+package com.isuwang.scala_commons.sql
 
 import java.sql.ResultSet
 

@@ -1,11 +1,11 @@
-package wangzx.scala_commons.sql_test
+package com.isuwang.scala_commons.sql_test
 
 import java.sql.{PreparedStatement, ResultSet}
 import javax.sql.DataSource
 import scala.language.implicitConversions
 
-import wangzx.scala_commons.sql.DbEnum
-import wangzx.scala_commons.sql._
+import com.isuwang.scala_commons.sql.DbEnum
+import com.isuwang.scala_commons.sql._
 
 object EnumTest {
 

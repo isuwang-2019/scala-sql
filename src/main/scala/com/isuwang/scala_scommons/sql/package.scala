@@ -1,4 +1,4 @@
-package wangzx.scala_commons
+package com.isuwang.scala_commons
 
 import javax.sql.DataSource
 import java.sql.{Blob, Clob, Connection, PreparedStatement, ResultSet, Timestamp}
@@ -27,7 +27,7 @@ package sql {
     * for values(of type T) to passed into Statement or passed out from ResultSet, it should has a contxt bound of
     * JdbcValueAccessor[T]
     *
-    * <ul> package wangzx.scala_commons.sql prdefined a lot of pre-defined implementation for the jdbc value types:
+    * <ul> package com.isuwang.scala_commons.sql prdefined a lot of pre-defined implementation for the jdbc value types:
     * <li> boolean, byte, short, Int, Long, Float, Double, BigDecimal, scala.BigDecimal
     * <li> String
     * <li> Date, Time, Timestamp

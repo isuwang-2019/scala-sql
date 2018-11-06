@@ -1,4 +1,4 @@
-package wangzx.scala_commons.sql_test
+package com.isuwang.scala_commons.sql_test
 
 import java.net.InetAddress
 import java.sql.{PreparedStatement, ResultSet}

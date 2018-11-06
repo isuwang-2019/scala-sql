@@ -1,4 +1,4 @@
-package wangzx.scala_commons.sql
+package com.isuwang.scala_commons.sql
 
 import java.sql._
 import java.lang.{Boolean => JBoolean, Byte => JByte, Integer => JInteger, Long => JLong, Short => JShort}

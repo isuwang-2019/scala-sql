@@ -1,8 +1,8 @@
-//package wangzx.scala_commons.sql_test
+//package com.isuwang.scala_commons.sql_test
 //
 //import java.sql.{Date, ResultSet}
 //
-//import wangzx.scala_commons.sql._
+//import com.isuwang.scala_commons.sql._
 //
 //import scala.annotation.meta.getter
 //import scala.util.Random
