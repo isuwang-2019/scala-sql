@@ -11,6 +11,8 @@ crossScalaVersions := Seq("2.11.11", "2.12.4")
 libraryDependencies ++= Seq(
   "org.slf4j" % "slf4j-api" % "1.7.9",
   "org.scala-lang" % "scala-reflect" % scalaVersion.value,
+  "com.github.jsqlparser" % "jsqlparser" % "1.2",
+
   "com.h2database" % "h2" % "1.4.184" % "test",
   "junit" % "junit" % "4.12" % "test",
   "ch.qos.logback" % "logback-classic" % "1.1.3" % "test",

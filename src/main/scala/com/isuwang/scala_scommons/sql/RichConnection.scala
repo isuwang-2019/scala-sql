@@ -2,7 +2,7 @@ package com.isuwang.scala_commons.sql
 
 import java.sql._
 
-
+import scala.language.experimental.macros
 import scala.collection.mutable.ListBuffer
 
 object RichConnection {
@@ -48,6 +48,13 @@ class RichConnection(val conn: Connection) {
     }
   }
 
+  def createBatch[T](proc: T=>SQLWithArgs): Batch[T] = macro BatchMacro.createBatchImpl[T]
+
+  /**
+    * translate the "insert into table set a = ?, b = ?" into "insert into table(a,b) values(?,?)
+    */
+  def createMysqlBatch[T](proc: T=>SQLWithArgs): Batch[T] = macro BatchMacro.createMySqlBatchImpl[T]
+
   def executeUpdate(stmt: SQLWithArgs): Int = executeUpdateWithGenerateKey(stmt)(null)
 
   @inline private def setStatementArgs(stmt: PreparedStatement, args: Seq[JdbcValue[_]]) =
@@ -64,7 +71,7 @@ class RichConnection(val conn: Connection) {
     try {
       if (stmt.args != null) setStatementArgs(prepared, stmt.args)
 
-      LOG.info("SQL Preparing: {} args: {}", Seq(stmt.sql, stmt.args): _*)
+      LOG.debug("SQL Preparing: {} args: {}", Seq(stmt.sql, stmt.args): _*)
 
       val result = prepared.executeUpdate()
 
@@ -73,7 +80,7 @@ class RichConnection(val conn: Connection) {
         processGenerateKeys(keys)
       }
 
-      LOG.info("SQL result: {}", result)
+      LOG.debug("SQL result: {}", result)
       result
     }
     finally  {
@@ -96,32 +103,34 @@ class RichConnection(val conn: Connection) {
   def eachRow[T : ResultSetMapper](sql: SQLWithArgs)(f: T => Unit) = withPreparedStatement(sql.sql){ prepared =>
     if (sql.args != null) setStatementArgs(prepared, sql.args)
 
-    LOG.info("SQL Preparing: {} args: {}", Seq(sql.sql, sql.args):_*)
+    LOG.debug("SQL Preparing: {} args: {}", Seq(sql.sql, sql.args):_*)
 
     val mapper = implicitly[ResultSetMapper[T]]
     val rs = prepared.executeQuery()
-    val rsMeta = rs.getMetaData
+    // val rsMeta = rs.getMetaData
+    var rowCount = 0
     while (rs.next()) {
       val mapped = mapper.from(rs)
       f(mapped)
+      rowCount += 1
     }
-    LOG.info("SQL result: {}", rs.getRow)
+    LOG.debug("SQL result: {}", rowCount)
   }
 
   def rows[T : ResultSetMapper](sql: SQLWithArgs): List[T] = withPreparedStatement(sql.sql) { prepared =>
     val buffer = new ListBuffer[T]()
     if (sql.args != null) setStatementArgs(prepared, sql.args)
 
-    LOG.info("SQL Preparing: {} args: {}", Seq(sql.sql, sql.args):_*)
+    LOG.debug("SQL Preparing: {} args: {}", Seq(sql.sql, sql.args):_*)
 
     val rs = prepared.executeQuery()
-    val rsMeta = rs.getMetaData
+    // val rsMeta = rs.getMetaData
     while (rs.next()) {
       val mapped = implicitly[ResultSetMapper[T]].from(rs)
       buffer += mapped
 
     }
-    LOG.info("SQL result: {}", buffer.size)
+    LOG.debug("SQL result: {}", buffer.size)
     buffer.toList
   }
 
@@ -129,17 +138,17 @@ class RichConnection(val conn: Connection) {
     val buffer = new ListBuffer[(T1,T2)]()
     if(sql.args != null) setStatementArgs(prepared, sql.args)
 
-    LOG.info("SQL Preparing: {} args: {}", Seq(sql.sql, sql.args):_*)
+    LOG.debug("SQL Preparing: {} args: {}", Seq(sql.sql, sql.args):_*)
 
     val rs = prepared.executeQuery()
-    val rsMeta = rs.getMetaData
+    // val rsMeta = rs.getMetaData
     while (rs.next()) {
       val t1: T1 = implicitly[ResultSetMapper[T1]].from(rs)
       val t2: T2 = implicitly[ResultSetMapper[T2]].from(rs)
       buffer += Tuple2(t1, t2)
     }
 
-    LOG.info("SQL result: {}", buffer.size)
+    LOG.debug("SQL result: {}", buffer.size)
 
     buffer.toList
   }
@@ -148,10 +157,10 @@ class RichConnection(val conn: Connection) {
     val buffer = new ListBuffer[(T1,T2, T3)]()
     if(sql.args != null) setStatementArgs(prepared, sql.args)
 
-    LOG.info("SQL Preparing: {} args: {}", Seq(sql.sql, sql.args):_*)
+    LOG.debug("SQL Preparing: {} args: {}", Seq(sql.sql, sql.args):_*)
 
     val rs = prepared.executeQuery()
-    val rsMeta = rs.getMetaData
+    // val rsMeta = rs.getMetaData
     while (rs.next()) {
       val t1: T1 = implicitly[ResultSetMapper[T1]].from(rs)
       val t2: T2 = implicitly[ResultSetMapper[T2]].from(rs)
@@ -159,7 +168,7 @@ class RichConnection(val conn: Connection) {
       buffer += Tuple3(t1, t2, t3)
     }
 
-    LOG.info("SQL result: {}", buffer.size)
+    LOG.debug("SQL result: {}", buffer.size)
 
     buffer.toList
   }
@@ -168,10 +177,10 @@ class RichConnection(val conn: Connection) {
     val buffer = new ListBuffer[(T1,T2, T3, T4)]()
     if(sql.args != null) setStatementArgs(prepared, sql.args)
 
-    LOG.info("SQL Preparing: {} args: {}", Seq(sql.sql, sql.args):_*)
+    LOG.debug("SQL Preparing: {} args: {}", Seq(sql.sql, sql.args):_*)
 
     val rs = prepared.executeQuery()
-    val rsMeta = rs.getMetaData
+    // val rsMeta = rs.getMetaData
     while (rs.next()) {
       val t1: T1 = implicitly[ResultSetMapper[T1]].from(rs)
       val t2: T2 = implicitly[ResultSetMapper[T2]].from(rs)
@@ -180,7 +189,7 @@ class RichConnection(val conn: Connection) {
       buffer += Tuple4(t1, t2, t3, t4)
     }
 
-    LOG.info("SQL result: {}", buffer.size)
+    LOG.debug("SQL result: {}", buffer.size)
 
     buffer.toList
   }
@@ -188,20 +197,21 @@ class RichConnection(val conn: Connection) {
   def row[T: ResultSetMapper](sql: SQLWithArgs): Option[T] = withPreparedStatement(sql.sql) { prepared =>
     if (sql.args != null) setStatementArgs(prepared, sql.args)
 
-    LOG.info("SQL Preparing: {} args: {}", Seq(sql.sql, sql.args): _*)
+    LOG.debug("SQL Preparing: {} args: {}", Seq(sql.sql, sql.args): _*)
 
     val rs = prepared.executeQuery()
 
     var result: Option[T] = None
-    var index = -1
-    while (index == -1 && rs.next()) {
-      index += 1
+
+    if(rs.next()) {
       result = Some(implicitly[ResultSetMapper[T]].from(rs))
+      if(rs.next())
+        LOG.warn("expect 1 row but has more")
+      else
+        LOG.debug("SQL result: 1")
     }
-    if(rs.next)
-      LOG.warn("expect 1 row but really more. SQL result: {}", rs.getRow - 1)
     else
-      LOG.info("SQL result: {}", rs.getRow)
+      LOG.debug("SQL result: 0")
 
     result
   }
@@ -209,22 +219,23 @@ class RichConnection(val conn: Connection) {
   def joinRow2[T1: ResultSetMapper, T2: ResultSetMapper](sql: SQLWithArgs): Option[(T1, T2)] = withPreparedStatement(sql.sql) { prepared =>
     if (sql.args != null) setStatementArgs(prepared, sql.args)
 
-    LOG.info("SQL Preparing: {} args: {}", Seq(sql.sql, sql.args): _*)
+    LOG.debug("SQL Preparing: {} args: {}", Seq(sql.sql, sql.args): _*)
 
     val rs = prepared.executeQuery()
 
     var result: Option[(T1, T2)] = None
-    var index = -1
-    while (index == -1 && rs.next()) {
-      index += 1
+
+    if(rs.next()) {
       val t1 = implicitly[ResultSetMapper[T1]].from(rs)
       val t2 = implicitly[ResultSetMapper[T2]].from(rs)
       result = Some(Tuple2(t1, t2))
+      if(rs.next())
+        LOG.warn("expect 1 row but has more")
+      else
+        LOG.debug("SQL result: 1")
     }
-    if(rs.next)
-      LOG.warn("expect 1 row but really more. SQL result: {}", rs.getRow - 1)
     else
-      LOG.info("SQL result: {}", rs.getRow)
+      LOG.debug("SQL result: 0")
 
     result
   }
@@ -232,23 +243,24 @@ class RichConnection(val conn: Connection) {
   def joinRow3[T1: ResultSetMapper, T2: ResultSetMapper, T3: ResultSetMapper](sql: SQLWithArgs): Option[(T1, T2, T3)] = withPreparedStatement(sql.sql) { prepared =>
     if (sql.args != null) setStatementArgs(prepared, sql.args)
 
-    LOG.info("SQL Preparing: {} args: {}", Seq(sql.sql, sql.args): _*)
+    LOG.debug("SQL Preparing: {} args: {}", Seq(sql.sql, sql.args): _*)
 
     val rs = prepared.executeQuery()
 
     var result: Option[(T1, T2, T3)] = None
-    var index = -1
-    while (index == -1 && rs.next()) {
-      index += 1
+
+    if(rs.next()) {
       val t1 = implicitly[ResultSetMapper[T1]].from(rs)
       val t2 = implicitly[ResultSetMapper[T2]].from(rs)
       val t3 = implicitly[ResultSetMapper[T3]].from(rs)
       result = Some(Tuple3(t1, t2, t3))
+      if(rs.next())
+        LOG.warn("expect 1 row but has more")
+      else
+        LOG.debug("SQL result: 1")
     }
-    if(rs.next)
-      LOG.warn("expect 1 row but really more. SQL result: {}", rs.getRow - 1)
     else
-      LOG.info("SQL result: {}", rs.getRow)
+      LOG.debug("SQL result: 0")
 
     result
   }
@@ -256,24 +268,25 @@ class RichConnection(val conn: Connection) {
   def joinRow4[T1: ResultSetMapper, T2: ResultSetMapper, T3: ResultSetMapper, T4: ResultSetMapper](sql: SQLWithArgs): Option[(T1, T2, T3, T4)] = withPreparedStatement(sql.sql) { prepared =>
     if (sql.args != null) setStatementArgs(prepared, sql.args)
 
-    LOG.info("SQL Preparing: {} args: {}", Seq(sql.sql, sql.args): _*)
+    LOG.debug("SQL Preparing: {} args: {}", Seq(sql.sql, sql.args): _*)
 
     val rs = prepared.executeQuery()
 
     var result: Option[(T1, T2, T3, T4)] = None
-    var index = -1
-    while (index == -1 && rs.next()) {
-      index += 1
+
+    if(rs.next()) {
       val t1 = implicitly[ResultSetMapper[T1]].from(rs)
       val t2 = implicitly[ResultSetMapper[T2]].from(rs)
       val t3 = implicitly[ResultSetMapper[T3]].from(rs)
       val t4 = implicitly[ResultSetMapper[T4]].from(rs)
       result = Some(Tuple4(t1, t2, t3, t4))
+      if(rs.next())
+        LOG.warn("expect 1 row but has more")
+      else
+        LOG.debug("SQL result: 1")
     }
-    if(rs.next)
-      LOG.warn("expect 1 row but really more. SQL result: {}", rs.getRow - 1)
     else
-      LOG.info("SQL result: {}", rs.getRow)
+      LOG.debug("SQL result: 0")
 
     result
   }
@@ -282,7 +295,7 @@ class RichConnection(val conn: Connection) {
 //    val prepared = conn.prepareStatement(sql.sql)
     if(sql.args != null) setStatementArgs(prepared, sql.args)
 
-    LOG.info("SQL Preparing: {} args: {}", Seq(sql.sql, sql.args):_*)
+    LOG.debug("SQL Preparing: {} args: {}", Seq(sql.sql, sql.args):_*)
 
     val rs = prepared.executeQuery()
 
