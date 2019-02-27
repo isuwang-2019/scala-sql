@@ -1,7 +1,8 @@
-package wangzx.scala_commons.sql
+package com.isuwang.scala_scommons.sql
 
 import java.sql.Connection
 import java.util
+import com.isuwang.scala_commons.sql._
 
 import net.sf.jsqlparser.expression.Expression
 import net.sf.jsqlparser.expression.operators.relational.ExpressionList
@@ -11,10 +12,6 @@ import net.sf.jsqlparser.statement.Statement
 import net.sf.jsqlparser.statement.insert.Insert
 
 import scala.reflect.macros.blackbox.Context
-import scala.language.experimental.macros
-import wangzx.scala_commons.sql._
-
-import scala.collection.JavaConverters._
 
 
 object BatchMacro {

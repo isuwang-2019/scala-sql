@@ -1,7 +1,5 @@
-package wangzx.scala_commons.sql_test
-
-import wangzx.scala_commons.sql._
-
+package com.isuwang.scala_commons.sql_test
+import com.isuwang.scala_commons.sql._
 object BatchTest1 {
 
   case class User(name:String, age:Int, email: String)

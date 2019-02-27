@@ -2,6 +2,8 @@ package com.isuwang.scala_commons.sql
 
 import java.sql._
 
+import com.isuwang.scala_scommons.sql._
+
 import scala.language.experimental.macros
 import scala.collection.mutable.ListBuffer
 

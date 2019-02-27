@@ -1,6 +1,8 @@
-package wangzx.scala_commons.sql
+package com.isuwang.scala_scommons.sql
 
 import java.sql.{Connection, SQLType, Types}
+
+import com.isuwang.scala_commons.sql._
 
 import scala.language.experimental.macros
 
@@ -19,7 +21,7 @@ trait Batch[T] {
 
 case class BatchImpl[T](conn: Connection, statement: String ) ( proc: T => List[JdbcValue[_]] ) extends Batch[T] {
 
-  val stmt = conn.conn.prepareStatement(statement)
+  val stmt = conn.prepareStatement(statement)
 
   var toBeCommit = 0
 
