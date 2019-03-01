@@ -27,7 +27,6 @@ resolvers ++= List("isuwang nexus" at "http://nexus.oa.isuwang.com/repository/ma
 
 publishTo := Some("nexus-releases" at "http://nexus.oa.isuwang.com/repository/maven-releases/")
 
-credentials += Credentials("Sonatype Nexus Repository Manager", "nexus.oa.isuwang.com", "admin", "6d17f21ed")
 
 publishArtifact in Test := false
 
