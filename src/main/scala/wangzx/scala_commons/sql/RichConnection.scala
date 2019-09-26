@@ -41,7 +41,7 @@ class RichConnection(val conn: Connection)(val jdbcValueMapperFactory: JdbcValue
       case BeanMapping.ClassOfBigDecimal =>
         rs.getBigDecimal(1).asInstanceOf[T]
       case BeanMapping.ClassOfScalaBigDecimal =>
-        BigDecimal(rs.getBigDecimal(1)).asInstanceOf[T]
+        Option(rs.getBigDecimal(1)).map(x => BigDecimal(x)).orNull.asInstanceOf[T]
       case BeanMapping.ClassOfSQLDate =>
         rs.getDate(1).asInstanceOf[T]
       case BeanMapping.ClassOfSQLTime =>
