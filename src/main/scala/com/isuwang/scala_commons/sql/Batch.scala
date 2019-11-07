@@ -1,6 +1,8 @@
-package wangzx.scala_commons.sql
+package com.isuwang.scala_commons.sql
 
 import java.sql.{Connection, SQLType, Types}
+
+import com.isuwang.scala_commons.sql._
 
 import scala.language.experimental.macros
 

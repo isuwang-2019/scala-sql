@@ -1,19 +1,11 @@
-package wangzx.scala_commons.sql
+package com.isuwang.scala_commons.sql
 
 import java.sql.Connection
 import java.util
 
-import net.sf.jsqlparser.expression.Expression
-import net.sf.jsqlparser.expression.operators.relational.ExpressionList
-import net.sf.jsqlparser.parser.{CCJSqlParser, CCJSqlParserUtil}
-import net.sf.jsqlparser.schema.Column
-import net.sf.jsqlparser.statement.Statement
-import net.sf.jsqlparser.statement.insert.Insert
 
 import scala.reflect.macros.blackbox.Context
 import scala.language.experimental.macros
-import wangzx.scala_commons.sql._
-
 import scala.collection.JavaConverters._
 
 
@@ -59,7 +51,7 @@ object BatchMacro {
       override def transform(tree: c.universe.Tree): c.universe.Tree = tree match {
 
         // tree is type checked
-        case i @ q"""wangzx.scala_commons.sql.`package`.SQLStringContext(scala.StringContext.apply(..${strings:List[c.Tree]})).sql(..$args)""" =>
+        case i @ q"""com.isuwang.scala_scommons.sql.`package`.SQLStringContext(scala.StringContext.apply(..${strings:List[c.Tree]})).sql(..$args)""" =>
 
           val statement = strings.map {
             case Literal(Constant(str: String)) =>
