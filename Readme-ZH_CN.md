@@ -78,6 +78,37 @@ scala-sql 为 `java.sql.Connection` & `java.sql.DataSource` 提供了如下增�
   }
   ```
   与 rows 相似。foreach 在迭代中执行代码，而不是返回一个 List[T]。
+- [batch 处理](docs/batch.md)
+  scala-sql提供了一种友好的方式来处理batch insert/update.
+  ```scala
+  case class User(name:String, age:Int, email: String)
+
+  def main(args: Array[String]): Unit = {
+
+    val conn = SampleDB.conn
+
+    // 代码块接收 User 作为参数，返回一个字符串插值。目前，仅支持在代码块的最后一个表达式是字符串插值。但前面代码可以自由，例如，进行必要的计算。
+    // 返回的 batch 对象，后续可以使用 addBatch(user: User) 来处理单行的插入，并以成批的方式进行提交。
+    // 也可以设置 autoCommitCount（批次提交记录数） 或者手动 commit 提交一批数据。
+    val batch = conn.createBatch[User] { u =>
+      val name = u.name.toUpperCase()
+      sql"insert into users(name, age, email) values(${name}, ${u.age}, ${u.email})"
+    }
+    
+    val users = User("u1", 10, "u1") :: User("u2", 20, "u2") :: Nil
+
+    users.foreach { u =>
+      batch.addBatch(u)
+    }
+
+    batch.close()
+
+    // print the rows for test
+    conn.rows[User]("select * from users").foreach(println)
+
+  }
+  ```
+  scala-sql还提供 `conn.createMySQLBatch` 方式，支持mysql的特定语法：`insert into table set col1=?, col2 =?` 并在编译期，转化为`insert into table (col1, col2) values(?,?)`的形式，使其也具备批量提交的能力。
 - generateKey
 - withStatement
   ```scala
@@ -97,11 +128,29 @@ scala-sql 为 `java.sql.Connection` & `java.sql.DataSource` 提供了如下增�
   ```
 
 # 编译期语法检查
+scala-sql 可以在编译时对源代码中的sql"statement"进行语法检查，诸如SQL语法错误，或者错误的表名、字段名拼写错误等，可以自动检查出来
 1. 在当前目录下编辑 scala-sql.properties 文件。 
 2. 设置 default.url, default.user, default.password, default.driver 信息，使之指向一个用于进行类型检查的数据库。
 3. 使用 SQL"" 插值。
 4. 如果我们的项目中会访问多个数据库，我们可以在最外层的类上加上 `@db(name="some")` 注释, 在配置文件中定义：`some.url, some.user, some.password, some.driver` 
 
+# JdbcValue[T]， JdbcValueAccessor[T]
+scala-sql defines type class `JdbcValueAccessor[T]`, any type which has an implicit context bound of `JdbcValueAccessor`
+can be passed into query, and passed out from ResultSet. 
+This include:
+- primary SQL types, such as `byte`, `short`, `int`, `string`, `date`, `time`, `timestamp`, `BigDecimal`
+- scala types: such as `scala.BigDecimal`
+- optional types. Now you can pass a `Option[BigDecimal]` into statement which will auto support the `null`
+- customize your type via define a implicit value `JdbcValueAccessor[T]`
+
+# ResultSetMapper[T]
+scala-sql define type class `ResultSetMapper[T]`, any type which has an implicit context of `ResultSetMapper`
+can be mapped to a ResulSet, thus, can be used in the `rows[T]`, `row[T]`, `foreach[T]` operations.
+
+instead of writing the ResultSetMapper yourself, scala-sql provide a Macro which automate generate the
+mapper for Case Class. 
+
+So, does it support all `Case Class` ? of couse not, eg. you Case class `case class User(name: String, url: URL)` is not supported because the url field is not compatible with SQL. the scala-sql Macro provide a stronger type check mechanism for ensure the `Case Class` is able to mapping from ResultSet. 
 
 sbt 依赖:
 =====
