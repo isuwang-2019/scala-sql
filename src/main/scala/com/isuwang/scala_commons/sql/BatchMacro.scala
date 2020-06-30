@@ -56,7 +56,7 @@ object BatchMacro {
       override def transform(tree: c.universe.Tree): c.universe.Tree = tree match {
 
         // tree is type checked
-        case i @ q"""wangzx.scala_commons.sql.`package`.SQLStringContext(scala.StringContext.apply(..${strings:List[c.Tree]})).sql(..$args)""" =>
+        case i @ q"""com.isuwang.scala_scommons.sql.`package`.SQLStringContext(scala.StringContext.apply(..${strings:List[c.Tree]})).sql(..$args)""" =>
 
           val statement = strings.map {
             case Literal(Constant(str: String)) =>
