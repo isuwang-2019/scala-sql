@@ -126,7 +126,7 @@ execute a query and result the resultset.
    supported.
 
 ### val result: Option\[TYPE\] = Connection.row\[TYPE\](sql)
-execute a query and return a Optional result. either Some(value) if having 1+ rows or
+execute a query and return a Optional result. either Option(value) if having 1+ rows or
  None if the query returns no rows.
 
 

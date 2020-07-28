@@ -34,7 +34,7 @@ object BeanBuilder {
     import c.universe._
 
     def directConvert(): Option[c.Tree] = {
-      if( F <:< T) Some(alias) //Some(f)
+      if( F <:< T) Option(alias) //Option(f)
       else None
     }
 
@@ -45,7 +45,7 @@ object BeanBuilder {
       )
       result match {
         case EmptyTree => None
-        case _ => Some(q"_root_.scala.Predef.implicitly[$F => $T].apply($alias)") // Some(result)
+        case _ => Option(q"_root_.scala.Predef.implicitly[$F => $T].apply($alias)") // Option(result)
       }
     }
 
@@ -63,7 +63,7 @@ object BeanBuilder {
             )
           mapTo match {
             case EmptyTree => None
-            case _ => Some(q"$alias.map(_root_.scala.Predef.implicitly[$fromElementType => $toElementType])") //Some(mapTo)
+            case _ => Option(q"$alias.map(_root_.scala.Predef.implicitly[$fromElementType => $toElementType])") //Option(mapTo)
           }
         case _ =>
           None
@@ -78,7 +78,7 @@ object BeanBuilder {
       )
       copyTo match {
         case EmptyTree => None
-        case _ => Some(q"($alias.copyTo[$T]:$T)")// Some(copyTo)
+        case _ => Option(q"($alias.copyTo[$T]:$T)")// Option(copyTo)
       }
     }
 
@@ -88,7 +88,7 @@ object BeanBuilder {
         val companion = T.typeSymbol.companion
         c.typecheck(q"""$companion.apply($f): $T""", silent = true) match {
           case EmptyTree => None
-          case x@_ => Some(q"$companion.apply($alias):$T")// Some(x)
+          case x@_ => Option(q"$companion.apply($alias):$T")// Option(x)
         }
       }
       else None
@@ -100,7 +100,7 @@ object BeanBuilder {
         val companion = F.typeSymbol.companion
         c.typecheck(q"""$companion.unapply($f).get:$T""", silent = true) match {
           case EmptyTree => None
-          case x@_ => Some(q"$companion.unapply($alias).get: $T")// Some(x)
+          case x@_ => Option(q"$companion.unapply($alias).get: $T")// Option(x)
         }
       }
       else None
@@ -115,7 +115,7 @@ object BeanBuilder {
 //        c.typecheck(
 //          q"""val fx = $Fcomp.unapply($f).get; $Tcomp.apply( fx ): $T""", silent = true) match {
 //          case EmptyTree => None
-//          case tree@_ => Some(tree)
+//          case tree@_ => Option(tree)
 //        }
 //      }
 //      else None
@@ -125,7 +125,7 @@ object BeanBuilder {
     def tryBuild(): Option[c.Tree] = {
       c.typecheck(q"""import ${c.prefix}._; build[$T]($f)() """, silent = true) match {
         case EmptyTree => None
-        case x@_ => Some(q"import ${c.prefix}._; build[$T]($alias)() ")// Some(x)
+        case x@_ => Option(q"import ${c.prefix}._; build[$T]($alias)() ")// Option(x)
       }
     }
 
@@ -198,9 +198,9 @@ object BeanBuilder {
         // first check additional which must be direct matched
         if (additionByName contains fieldName) {
           val add = additionByName(fieldName)
-          Some(q"$termName = $add")  // 2017-11-22 additional part should not convert based on it's infer type.
+          Option(q"$termName = $add")  // 2017-11-22 additional part should not convert based on it's infer type.
           // val convert = convertType(c)(fieldName, add, add.tpe, fieldType)
-          // Some(q"""$termName = $convert""")
+          // Option(q"""$termName = $convert""")
         }
         else { // then check source fields, support convert
           val matchedFields: List[(c.Tree, TermName, MethodSymbol)] = sourceFields2.filter(tree_method => tree_method._3.name.toString == fieldName)
@@ -211,7 +211,7 @@ object BeanBuilder {
 
               // using tree for typecheck, but generate code on alias
               val convert = convertType(c)(fieldName, q"""$tree.$termName""", q"$alias.$termName",srcType, fieldType)
-              Some(q"""$termName = $convert""")
+              Option(q"""$termName = $convert""")
             case Nil => // no source field matched, error checked via Case-Class's constructor
               None
             case header :: tailer =>

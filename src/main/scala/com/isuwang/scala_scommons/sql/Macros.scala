@@ -20,7 +20,7 @@ object Macros {
     override def from(rs: ResultSet): User = {
       val NAME = Field[String]("name")
       val AGE = Field[Int]("age")
-      val CLASSROOM = Field[Int]("classRoom", Some("apply$default$3"))
+      val CLASSROOM = Field[Int]("classRoom", Option("apply$default$3"))
 
       User(NAME(rs), AGE(rs), CLASSROOM(rs))
     }
@@ -51,7 +51,7 @@ object Macros {
 
       val tree = if(term.isParamWithDefault) {
         val defMethod: c.universe.Symbol = t.tpe.typeSymbol.asClass.companion.asModule.typeSignature.member(TermName("$lessinit$greater$default$" + index))
-        q"""val $newTerm = Field[${term.typeSignature}]($name, Some($companion.$defMethod) )"""
+        q"""val $newTerm = Field[${term.typeSignature}]($name, Option($companion.$defMethod) )"""
       }
       else
         q"""val $newTerm = Field[${term.typeSignature}]($name) """
@@ -88,7 +88,7 @@ object Macros {
       x.tree match {
         case q"""new $t($name)""" if t.symbol.asClass.fullName == classOf[db].getName =>
           val Literal(Constant(str: String)) = name
-          Some(str)
+          Option(str)
         case _ => None
       }
     } match {

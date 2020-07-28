@@ -86,7 +86,7 @@ class RichConnection(val conn: Connection) {
 
     executeUpdateWithGenerateKey(stmt){ rs =>
       if(rs.next)
-        t = Some( implicitly[JdbcValueAccessor[T]].passOut(rs, 1) )
+        t = Option( implicitly[JdbcValueAccessor[T]].passOut(rs, 1) )
     }
 
     assert( t.isDefined, s"the sql doesn't return a generated key but expected" )
@@ -196,7 +196,7 @@ class RichConnection(val conn: Connection) {
     var index = -1
     while (index == -1 && rs.next()) {
       index += 1
-      result = Some(implicitly[ResultSetMapper[T]].from(rs))
+      result = Option(implicitly[ResultSetMapper[T]].from(rs))
     }
     if(rs.next)
       LOG.warn("expect 1 row but really more. SQL result: {}", rs.getRow - 1)
@@ -219,7 +219,7 @@ class RichConnection(val conn: Connection) {
       index += 1
       val t1 = implicitly[ResultSetMapper[T1]].from(rs)
       val t2 = implicitly[ResultSetMapper[T2]].from(rs)
-      result = Some(Tuple2(t1, t2))
+      result = Option(Tuple2(t1, t2))
     }
     if(rs.next)
       LOG.warn("expect 1 row but really more. SQL result: {}", rs.getRow - 1)
@@ -243,7 +243,7 @@ class RichConnection(val conn: Connection) {
       val t1 = implicitly[ResultSetMapper[T1]].from(rs)
       val t2 = implicitly[ResultSetMapper[T2]].from(rs)
       val t3 = implicitly[ResultSetMapper[T3]].from(rs)
-      result = Some(Tuple3(t1, t2, t3))
+      result = Option(Tuple3(t1, t2, t3))
     }
     if(rs.next)
       LOG.warn("expect 1 row but really more. SQL result: {}", rs.getRow - 1)
@@ -268,7 +268,7 @@ class RichConnection(val conn: Connection) {
       val t2 = implicitly[ResultSetMapper[T2]].from(rs)
       val t3 = implicitly[ResultSetMapper[T3]].from(rs)
       val t4 = implicitly[ResultSetMapper[T4]].from(rs)
-      result = Some(Tuple4(t1, t2, t3, t4))
+      result = Option(Tuple4(t1, t2, t3, t4))
     }
     if(rs.next)
       LOG.warn("expect 1 row but really more. SQL result: {}", rs.getRow - 1)

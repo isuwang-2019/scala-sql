@@ -39,15 +39,15 @@ object BuilderTest {
 
   def main(args: Array[String]): Unit = {
 
-    val someStr = Some("123")
+    val someStr = Option("123")
     //val someInt = someStr.copyTo[Int]
     val userMapper: ResultSetMapper[PersonAddress] = ResultSetMapper.material[PersonAddress]
 
-    //val dady = Person("120", "wangzx", Some("120"), PersonAddress("gd", "gz"))
+    //val dady = Person("120", "wangzx", Option("120"), PersonAddress("gd", "gz"))
     val person = Person("123", "wangzhx", List("123"), PersonAddress("gd", "gz"))
-    val user = BeanBuilder.build[User](person)("score"->Some(100))
+    val user = BeanBuilder.build[User](person)("score"->Option(100))
 
-    assert( user == User(123, "wangzhx", List(123), UserAddress("gd", "gz"), Some(100)))
+    assert( user == User(123, "wangzhx", List(123), UserAddress("gd", "gz"), Option(100)))
   }
 
 }

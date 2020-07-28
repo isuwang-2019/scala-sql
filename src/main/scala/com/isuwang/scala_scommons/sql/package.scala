@@ -266,21 +266,21 @@ package object sql {
 
   class JdbcValueAccessor_Option[T: JdbcValueAccessor] extends JdbcValueAccessor[Option[T]] {
     override def passIn(stmt: PreparedStatement, index: Int, value: Option[T]): Unit = value match {
-      case Some(t) => implicitly[JdbcValueAccessor[T]].passIn(stmt, index, t)
+      case Option(t) => implicitly[JdbcValueAccessor[T]].passIn(stmt, index, t)
       case None => stmt.setObject(index, null) // TODO or setNull
     }
 
     override def passOut(rs: ResultSet, index: Int): Option[T] = {
       if( rs.getObject(index) == null) None
       else {
-        Some( implicitly[JdbcValueAccessor[T]].passOut(rs, index) )
+        Option( implicitly[JdbcValueAccessor[T]].passOut(rs, index) )
       }
     }
 
     override def passOut(rs: ResultSet, name: String): Option[T] = {
       if( rs.getObject(name) == null) None
       else {
-        Some( implicitly[JdbcValueAccessor[T]].passOut(rs, name) )
+        Option( implicitly[JdbcValueAccessor[T]].passOut(rs, name) )
       }
     }
   }
@@ -327,7 +327,7 @@ package object sql {
     def get[T: JdbcValueAccessor](label: String): T = implicitly[JdbcValueAccessor[T]].passOut(rs, label)
 
     def getOption[T: JdbcValueAccessor](index: Int): Option[T] =
-      if(rs.getObject(index)==null) None else Some(implicitly[JdbcValueAccessor[T]].passOut(rs, index))
+      if(rs.getObject(index)==null) None else Option(implicitly[JdbcValueAccessor[T]].passOut(rs, index))
   }
 
   /**
@@ -356,7 +356,7 @@ package object sql {
           i += 1
         }
         val newName = sb.toString
-        if(newName != name) Some(newName)
+        if(newName != name) Option(newName)
         else None
       }
 
@@ -369,7 +369,7 @@ package object sql {
         }
         else {
           default match {
-            case Some(m) => m
+            case Option(m) => m
             case None => throw new RuntimeException(s"The ResultSet have no field $name but it is required")
           }
         }
